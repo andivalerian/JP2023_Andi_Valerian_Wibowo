@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Api RS</title>
+</head>
+
+<body>
+
+    <input type="text" id="search" placeholder="search">
+    <table border="1">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Email</th>
+                <th>Detail</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <div id="detail"></div>
+
+    <script>
+        const tbody = document.querySelector('tbody')
+        const detail = document.getElementById('detail')
+        const searchForm = document.getElementById('search')
+        let usersData = [];
+
+        const loadData = async () => {
+            try {
+                const url = await fetch('https://data.jakarta.go.id/read-resource/get-json/rsdkijakarta-2017-10/8e179e38-c1a4-4273-872e-361d90b68434');
+                usersData = await url.json();
+                console.log(usersData)
+                loadUserData(usersData);
+            } catch (err) {
+                console.log(err)
+            }
+        }
+
+        const loadUserData = (data) => {
+            let no = 1;
+            const output = data.map((el) => {
+                return `
+                <tr>
+                    <td>` + (no++) + `</td>
+                    <td>${el.nama_rumah_sakit}</td>
+                    <td>${el.jenis_rumah_sakit}</td>
+                    <td>${el.alamat_rumah_sakit}</td>
+                    <td>${el.kelurahan}</td>
+                    <td>${el.kecamatan}</td>
+                    <td>${el.kota}</td>
+                    <td><button onclick='showDetail(${el.id})'>Detail</button></td>
+                </tr>
+                `
+            }).join('')
+            tbody.innerHTML = output;
+        }
+
+
+        function showDetail(id) {
+            fetch('https://jsonplaceholder.typicode.com/users/' + id)
+                .then((res) => res.json())
+                .then((data) => {
+                    detail.innerHTML = ''
+                    detail.insertAdjacentHTML('beforeend', `
+                            <ul>
+                                <li>${data.nama_rumah_sakit}</li>
+                                <li>${data.jenis_rumah_sakit}</li>
+                                <li>${data.alamat_rumah_sakit}</li>
+                                <li>${data.kelurahan}</li>
+                                <li>${data.kecamatan}</li>
+                                <li>${data.kota}</li>
+                            </ul>
+                    `)
+                })
+        }
+
+        searchForm.addEventListener('keyup', (e) => {
+            const value = e.target.value.toLowerCase();
+            const input = usersData.filter((data) => {
+                return (
+                    data..toLowerCase().includes(value)
+                )
+            })
+            loadUserData(input)
+        })
+
+        loadData()
+    </script>
+</body>
+
+</html>
